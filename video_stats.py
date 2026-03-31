@@ -6,12 +6,13 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path = "./.env")
 API_KEY = os.getenv("API_KEY")
 
-# Channel handle
+BASE_URL = 'https://youtube.googleapis.com/youtube/v3'
 channel_handle = 'MrBeast'
 
+# Fetch playlist id
 def get_playlist_id():
     try:
-        url = f'https://youtube.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle={channel_handle}&key={API_KEY}'
+        url = f'{BASE_URL}/channels?part=contentDetails&forHandle={channel_handle}&key={API_KEY}'
 
         response = requests.get(url)
 
@@ -25,6 +26,18 @@ def get_playlist_id():
 
     except requests.exceptions.RequestException as e:
         raise e 
+
+#Fecth playlist items
+def playlist_items():
+    max_results = 50
+    playlist_id = get_playlist_id()
+    url = f'{BASE_URL}playlistItems?part=contentDetails&maxResults={max_results}&playlistId={playlist_id}&key={API_KEY}'
+
+    response = requests.get(url)
+
+    data = response.json()
+
+    return data 
 
 
 if __name__ == "__main__":
