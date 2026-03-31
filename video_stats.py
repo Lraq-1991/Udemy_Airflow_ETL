@@ -28,17 +28,37 @@ def get_playlist_id():
         raise e 
 
 #Fecth playlist items
-def playlist_items():
+def get_videos_ids( playlist_id ):
+    global API_KEY
     max_results = 50
-    playlist_id = get_playlist_id()
-    url = f'{BASE_URL}playlistItems?part=contentDetails&maxResults={max_results}&playlistId={playlist_id}&key={API_KEY}'
+    page_token = None
+    videos_ids = []
+    
+    # Playlist items call
+    playlist_items_url = f'{BASE_URL}/playlistItems?part=contentDetails&maxResults={max_results}&playlistId={playlist_id}&key={API_KEY}'
 
-    response = requests.get(url)
+    try:
 
-    data = response.json()
+        url = playlist_items_url
 
-    return data 
+        response = requests.get(url)
+
+        response.raise_for_status()
+
+        data = response.json()
+
+        for item in data.get('items',[]):
+            video_id = item['contentDetails']['videoId']
+            videos_ids.append(video_id)
+            
+        return videos_ids
+
+    except requests.exceptions.RequestException as e:
+        raise e
+
+    return 0
 
 
 if __name__ == "__main__":
-    get_playlist_id()
+    playlist_id = get_playlist_id()
+    print(get_videos_ids(playlist_id))
